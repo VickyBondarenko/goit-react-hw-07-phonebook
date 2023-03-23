@@ -1,42 +1,56 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { nanoid } from 'nanoid';
+
+import { fetchContacts, addContact, deleteContact } from './operations';
 
 const phonebookSlice = createSlice({
-  name: '@@contacts',
+  name: '@@phoneBook',
   initialState: {
-    contacts: [],
+    contacts: { items: [], isLoading: false, error: null },
     filter: '',
   },
   reducers: {
-    addContact: {
-      reducer: (state, action) => {
-        state.contacts.push(action.payload);
-      },
-
-      prepare(user) {
-        return {
-          payload: {
-            id: nanoid(),
-            name: user.name,
-            number: user.number,
-          },
-        };
-      },
-    },
-
-    removeContact(state, action) {
-      const itemIndex = state.contacts.findIndex(
-        contact => contact.id === action.payload
-      );
-      state.contacts.splice(itemIndex, 1);
-    },
-
     changeFilter(state, action) {
       state.filter = action.payload;
     },
   },
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContacts.fulfilled, (state, action) => {
+        state.contacts.items = action.payload;
+      })
+      .addCase(addContact.fulfilled, (state, action) => {
+        state.contacts.items.push(action.payload);
+      })
+      .addCase(deleteContact.fulfilled, (state, action) => {
+        const itemIndex = state.contacts.items.findIndex(
+          item => item.id === action.payload.id
+        );
+        state.contacts.items.splice(itemIndex, 1);
+      })
+
+      .addMatcher(
+        action => action.type.endsWith('/pending'),
+        state => {
+          state.contacts.isLoading = true;
+          state.contacts.error = null;
+        }
+      )
+      .addMatcher(
+        action => action.type.endsWith('/rejected'),
+        (state, action) => {
+          state.contacts.isLoading = false;
+          state.contacts.error = action.payload;
+        }
+      )
+      .addMatcher(
+        action => action.type.endsWith('/fulfilled'),
+        state => {
+          state.contacts.isLoading = false;
+          state.contacts.error = null;
+        }
+      );
+  },
 });
 
 export const phonebookReducer = phonebookSlice.reducer;
-export const { addContact, removeContact, changeFilter } =
-  phonebookSlice.actions;
+export const { changeFilter } = phonebookSlice.actions;

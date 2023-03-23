@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from '../../redux/phonebookSlice';
+import { addContact } from '../../redux/operations';
+import { selectItems } from '../../redux/selectors';
+
 import css from './formStyle.module.css';
 
 export const Form = () => {
@@ -12,7 +14,21 @@ export const Form = () => {
     number,
   };
 
-  const { contacts } = useSelector(state => state.contacts);
+  const handlestateInpyt = e => {
+    const { value, name } = e.target;
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+      default:
+        return;
+    }
+  };
+
+  const contacts = useSelector(selectItems);
   const dispatch = useDispatch();
 
   const handleCheck = data => {
@@ -32,20 +48,6 @@ export const Form = () => {
     handleCheck(user);
     setName('');
     setNumber('');
-  };
-
-  const handlestateInpyt = e => {
-    const { value, name } = e.target;
-    switch (name) {
-      case 'name':
-        setName(value);
-        break;
-      case 'number':
-        setNumber(value);
-        break;
-      default:
-        return;
-    }
   };
 
   return (

@@ -1,30 +1,24 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { removeContact } from '../../redux/phonebookSlice';
+import { deleteContact } from '../../redux/operations';
+import { applayFilter } from '../../redux/selectors';
 import css from './listStyle.module.css';
 
 export const List = () => {
-  const { contacts, filter } = useSelector(state => state.contacts);
-
   const dispatch = useDispatch();
-
-  const applayFilter = () => {
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().includes(filter.toLowerCase())
-    );
-  };
-
-  function handleDelete(e) {
-    dispatch(removeContact(e.target.id));
-  }
+  const contactsList = useSelector(applayFilter);
 
   return (
     <ul className={css.list}>
-      {applayFilter().map(({ id, name, number }) => (
+      {contactsList.map(({ id, name, phone }) => (
         <li className={css.item} key={id}>
           <p>
-            {name}: {number}
+            {name}: {phone}
           </p>
-          <button className={css.list_btn} onClick={handleDelete} id={id}>
+          <button
+            className={css.list_btn}
+            onClick={event => dispatch(deleteContact(event.target.id))}
+            id={id}
+          >
             Delete
           </button>
         </li>

@@ -1,14 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { changeFilter } from '../../redux/phonebookSlice';
+import { selectFilterValue } from '../../redux/selectors';
 
 export const Filter = () => {
-  const { filter } = useSelector(state => state.contacts);
+  const filter = useSelector(selectFilterValue);
 
   const dispatch = useDispatch();
-
-  const onChangeSearch = e => {
-    dispatch(changeFilter(e.target.value));
-  };
 
   return (
     <div className="filter">
@@ -17,7 +14,7 @@ export const Filter = () => {
         type="text"
         placeholder="Type to search ..."
         value={filter}
-        onChange={onChangeSearch}
+        onChange={e => dispatch(changeFilter(e.target.value))}
       />
     </div>
   );
